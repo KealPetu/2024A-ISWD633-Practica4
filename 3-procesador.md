@@ -12,6 +12,13 @@ Asignar núcleos de CPU específicos:
 **¿Como saber el numero de procesadores virtuales que tiene una máquina?**
 ## COMPLETAR
 
+Podemos utilizar el comando nproc:
+
+```bash
+$ nproc
+12
+```
+
 ## Ejemplos
 _Puedes copiar y ejecutar directamente cada uno de los comandos_
 
