@@ -1,6 +1,6 @@
-FROM centos:7
-RUN yum -y update
-RUN yum -y install httpd
-COPY ./web /var/www/html
+FROM alpine:latest
+RUN apk update
+RUN apk add apache2
+COPY ./web /var/www/localhost/htdocs/
 EXPOSE 80
-CMD ["apachectl", "-D", "FOREGROUND"]
+CMD ["httpd", "-D", "FOREGROUND"]

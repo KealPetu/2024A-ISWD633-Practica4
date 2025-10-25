@@ -1,5 +1,6 @@
 # Dockerfile
 Un Dockerfile es un archivo de texto plano que contiene una serie de instrucciones que Docker utiliza para construir una imagen de contenedor Docker. Este conjunto de instrucciones define cómo se debe configurar y construir una imagen de contenedor, incluyendo qué sistema operativo base usar, qué software instalar, qué archivos copiar en el contenedor y cómo configurar el entorno de ejecución.
+
  ![Dockerfile](imagenes/relacion.PNG)
 
 
@@ -51,18 +52,89 @@ docker build -t <nombre imagen>:<version> .
 
  
 ### Ejecutar el archivo Dockerfile y construir una imagen en la versión 1.0
-```
-
+```dockerfile
+FROM alpine:latest
+RUN apk update
+RUN apk add apache2
+COPY ./web /var/www/html
+EXPOSE 80
+CMD ["apachectl", "-D", "FOREGROUND"]
 ```
 
 **¿Cuántos pasos se han ejecutado?**
 # RESPONDER 
 
+Ejecutaria un total de 6 pasos
+
 ### Inspeccionar la imagen creada
 # COMPLETAR CON UNA CAPTURA
 
+```bash
+$ docker inspect server:1.0
+[
+    {
+        "Id": "sha256:e7f8b99fb0f9359398371b70af91ccd68adba59f26901ab10594f1a76825bf08",
+        "RepoTags": [
+            "server:1.0"
+        ],
+        "RepoDigests": [],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2025-10-24T22:15:06.652959772-05:00",
+        "DockerVersion": "",
+        "Author": "",
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 14852691,
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/rmhzifeyvosklce4g5npqfgp6/diff:/var/lib/docker/overlay2/t8vclzlifhm0umz9bjm5fstbo/diff:/var/lib/docker/overlay2/4419dc91dd691c4f84be3c85aa37a1cdc22751a05dfb6373fee6af19f67bdfbf/diff",
+                "MergedDir": "/var/lib/docker/overlay2/c1mo1bt72h0jo5m613nmqwa9e/merged",
+                "UpperDir": "/var/lib/docker/overlay2/c1mo1bt72h0jo5m613nmqwa9e/diff",
+                "WorkDir": "/var/lib/docker/overlay2/c1mo1bt72h0jo5m613nmqwa9e/work"
+            },
+            "Name": "overlay2"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:256f393e029fa2063d8c93720da36a74a032bed3355a2bc3e313ad12f8bde9d1",
+                "sha256:1810fbca996da9e9f28ccea02769b617200c865675bcf6b44014c74a86c27d6b",
+                "sha256:04e46fbefe99bb2e8dd7c5337f8be3c3cb3a9b066efb774399571b5c73550934",
+                "sha256:124d76d2793fd36bd5f3258e324a50de05b68e15ba5ea954542e93e61e7308b8"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2025-10-24T22:15:07.025734546-05:00"
+        },
+        "Config": {
+            "ArgsEscaped": true,
+            "Cmd": [
+                "httpd",
+                "-D",
+                "FOREGROUND"
+            ],
+            "Entrypoint": null,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "ExposedPorts": {
+                "80/tcp": {}
+            },
+            "Labels": null,
+            "OnBuild": null,
+            "User": "",
+            "Volumes": null,
+            "WorkingDir": "/"
+        }
+    }
+]
+```
+
 **Modificar el archivo index.html para incluir su nombre**
-**¿Cuántos pasos se han ejecutado? ¿Observa algo diferente en la creación de la imagen**
+**¿Cuántos pasos se han ejecutado? ¿Observa algo diferente en la creación de la imagen?**
+
+Se ejecutaron 6 pasos en total, solo se ejecuto el paso de COPY de nuevo.
 
 ## Mecanismo de caché
 Docker usa un mecanismo de caché cuando crea imágenes para acelerar el proceso de construcción y evitar la repetición de pasos que no han cambiado. Cada instrucción en un Dockerfile crea una capa en la imagen final. Docker intenta reutilizar las capas de una construcción anterior si no han cambiado, lo que reduce significativamente el tiempo de construcción.
@@ -73,15 +145,19 @@ Docker usa un mecanismo de caché cuando crea imágenes para acelerar el proceso
 ![mapeo](imagenes/dockerfile-cache.PNG)
 
 ### Crear un contenedor a partir de las imagen creada, mapear todos los puertos
-```
-
+```bash
+$ docker run -d -p 3000:80 --name my-server server:1.0
 ```
 
 ### ¿Con que puerto host se está realizando el mapeo?
 # COMPLETAR CON LA RESPUESTA
 
+Se esta mapeando con el puerto 3000 del host
+
 **¿Qué es una imagen huérfana?**
 # COMPLETAR CON LA RESPUESTA
+
+Es una imagen que no tiene ninguna etiqueta asociada y no está referenciada por ningún contenedor o imagen
 
 ### Identificar imágenes huérfanas
 ```
@@ -106,6 +182,3 @@ docker build -t <nombre imagen>:<version> -f <ruta y nombre del Dockerfile> .
 
 ## Por ejemplo
 docker build -t imagen:1.0 -f Dockerfile-custom .
-
-
-
